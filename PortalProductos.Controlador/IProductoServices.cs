@@ -8,5 +8,7 @@ namespace PortalProductos.Controlador
         Task<List<Productos>> ObtieneProductosAsync();
         Task<List<Productos>> ConsultaDinamica(string? nombre, string? idCliente);
         Task AgregarProducto(Productos nuevoProducto);
+        Task EliminarProductoAsync(int id);
+        Task EditarProductoAsync(Productos productoActualizado);
     }
 }

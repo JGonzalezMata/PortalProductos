@@ -1,4 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using PortalProductos.Controlador
+@inject ISecurityService SecurityService
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">PortalProductos</a>
     </div>
@@ -14,11 +19,31 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="productos">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Consulta productos
-            </NavLink>
-        </div>
+        @if (SecurityService.isAuth)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="productos">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Consulta productos
+                </NavLink>
+            </div>
+        }
+
     </nav>
 </div>
 
+@code{
+    protected override void OnInitialized()
+    {
+        SecurityService.OnAuthStateChanged += RefrescarUI;
+    }
+
+    public void Dispose()
+    {
+        SecurityService.OnAuthStateChanged -= RefrescarUI;
+    }
+
+    public async Task RefrescarUI()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+}

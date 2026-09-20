@@ -1,13 +1,16 @@
 ﻿@page "/productos"
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using PortalProductos.Controlador
 @using EntidadesProductos = PortalProductos.Modelo.Entidades
 @inject IProductoServices ProductoService
+@inject ISecurityService SecurityService
+@inject NavigationManager Navigation
 
 
 <PageTitle>Productos</PageTitle>
 <h3>Catálogo de Productos</h3>
 
+<!-- #region Bloque busqueda/insertar -->
 @if (!mostrarFormularioAlta)
 {
 <!-- Busqueda Dinamica -->
@@ -49,34 +52,34 @@
 }
 else
 {
-<!-- Insertar -->
-    <div class="card mb-4">
+<!-- Insertar o actualizar -->
+    <div class="card mb-4 border-primary">
         <div class="card-header bg-primary text-white">
-            <h5>Crear Nuevo Producto</h5>
+            <h5 class="mb-0">@(editarProducto ? "Modificar producto" : "Crear nuevo producto")</h5>
         </div>
         <div class="card-body">
-            <EditForm Model="nuevoProducto" OnValidSubmit="GuardarNuevoProducto">
+            <EditForm Model="productoForm" OnValidSubmit="GuardarNuevoProducto">
                 <DataAnnotationsValidator />
 
                 <div class="row g-3">
                     <div class="col-md-5">
                         <label class="form-label">Nombre del Producto</label>
-                        <InputText @bind-Value="nuevoProducto.Nombre" class="form-control" placeholder="Ej. Teclado Mecánico" />
+                        <InputText @bind-Value="productoForm.Nombre" class="form-control" placeholder="Ej. Teclado Mecánico" />
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label">Precio ($)</label>
-                        <InputNumber @bind-Value="nuevoProducto.Precio" class="form-control" placeholder="0.00" />
+                        <InputNumber @bind-Value="productoForm.Precio" class="form-control" placeholder="0.00" />
                     </div>
 
                     <div class="col-md-5">
                         <label class="form-label">ID de Cliente</label>
-                        <InputText @bind-Value="nuevoProducto.idCliente" class="form-control" />
+                        <InputText @bind-Value="productoForm.idCliente" class="form-control" />
                     </div>
 
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-plus-lg"></i> Guardar
+                            <i class="bi bi-plus-lg"></i> @(editarProducto ? "Actualizar" : "Guardar")
                         </button>
                     </div>
                 </div>
@@ -84,8 +87,9 @@ else
         </div>
     </div>
 }
+<!-- #endregion -->
 
-<!-- Boton swap estado -->
+<!-- #region Boton swap estado -->
 <div class="d-flex justify-content-end mb-3">
     <button class="btn @(mostrarFormularioAlta ? "btn-secondary" : "btn-primary")" 
             @onclick="AlternarVista">
@@ -93,8 +97,9 @@ else
         @(mostrarFormularioAlta ? "Volver a la Búsqueda" : "Agregar Nuevo Producto")
     </button>
 </div>
+<!-- #endregion -->
 
-<!-- Tabla -->
+<!-- #region Tabla -->
 @if (productos == null)
 {
     <p><em>Cargando productos...</em></p>
@@ -124,8 +129,14 @@ else
                     <td>$@prod.Precio</td>
                     <td>@prod.idCliente</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-warning me-1">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        <button class="btn btn-sm btn-outline-warning me-1"
+                        @onclick="() => CargarEditar(prod)">Editar</button>
+
+                        <button class="btn btn-sm btn-outline-danger"
+                        @onclick="() => EliminarProducto(prod.Id)">
+                            <i class="bi bi-trash"></i>Eliminar
+                        </button>
+
                     </td>
                 </tr>
             }
@@ -133,15 +144,29 @@ else
     </table>
 }
 
+<!-- #endregion -->
+
 @code {
+    #region Variables
     private List<EntidadesProductos.Productos>? productos;
-    private EntidadesProductos.Productos nuevoProducto = new EntidadesProductos.Productos();
+    private EntidadesProductos.Productos productoForm = new EntidadesProductos.Productos();
     private string? filtroNombre;
     private string? filtroIdCliente;
     private bool mostrarFormularioAlta = false;
-
+    private bool editarProducto = false;
     //protected override async Task OnInitializedAsync() => await CargarProductos();
-    protected override async Task OnInitializedAsync() => await FiltrarProductos();
+    //protected override async Task OnInitializedAsync() => await FiltrarProductos();
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!SecurityService.isAuth)
+        {
+            Navigation.NavigateTo("");
+            return;
+        }
+        await FiltrarProductos();
+    }
 
     private void AlternarVista()
     {
@@ -149,7 +174,7 @@ else
 
         if (!mostrarFormularioAlta)
         {
-            nuevoProducto = new EntidadesProductos.Productos();
+            productoForm = new EntidadesProductos.Productos();
         }
     }
 
@@ -160,11 +185,20 @@ else
 
     private async Task GuardarNuevoProducto()
     {
-        if (!string.IsNullOrWhiteSpace(nuevoProducto.Nombre))
+        if (!string.IsNullOrWhiteSpace(productoForm.Nombre))
         {
-            await ProductoService.AgregarProducto(nuevoProducto);
 
-            nuevoProducto = new EntidadesProductos.Productos();
+            if (editarProducto)
+            {
+                await ProductoService.EditarProductoAsync(productoForm);
+            }
+            else
+            {
+                await ProductoService.AgregarProducto(productoForm);
+            }
+
+
+            productoForm = new EntidadesProductos.Productos();
 
             mostrarFormularioAlta = false;
 
@@ -177,10 +211,32 @@ else
         productos = await ProductoService.ConsultaDinamica(filtroNombre, filtroIdCliente);
     }
 
+    private async Task EliminarProducto(int id)
+    {
+        await ProductoService.EliminarProductoAsync(id);
+
+        await FiltrarProductos();
+    }
+
+    private void CargarEditar(EntidadesProductos.Productos productoSelect)
+    {
+        productoForm = new EntidadesProductos.Productos
+        {
+            Id = productoSelect.Id,
+            Nombre = productoSelect.Nombre,
+            Precio = productoSelect.Precio,
+            idCliente = productoSelect.idCliente
+        };
+
+        editarProducto = true;
+        mostrarFormularioAlta = true;
+    }
+
     private async Task LimpiarFiltros()
     {
         filtroNombre = string.Empty;
         filtroIdCliente = string.Empty;
         await FiltrarProductos();
     }
+
 }

@@ -1,7 +1,77 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 @using PortalProductos.Controlador
-@inject IProductoServices ProductoServices
+@inject ISecurityService SecurityService
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Login</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5" style="max-width: 450px;">
+    @if (SecurityService.isAuth)
+    {
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h4 class="card-title text-success">Bienvenido, @SecurityService.UsuarioActual!</h4>
+                <p class="card-text">Has iniciado sesión correctamente.</p>
+                <button class="btn btn-outline-danger" @onclick="CerrarSesion">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">Inicio de Sesión</h4>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(mensajeError))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @mensajeError
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" class="form-control" @bind="usuario"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" @bind="password"/>
+                </div>
+
+                <button class="btn btn-primary w-100" @onclick="IniciarSesion">
+                    Ingresar
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code{
+    private string usuario = "";
+    private string password = "";
+    private string? mensajeError;
+
+    private async Task IniciarSesion()
+    {
+        var isLoggedIn = await SecurityService.LoginAsync(usuario, password);
+        if (isLoggedIn)
+        {
+            mensajeError = null;
+            Navigation.NavigateTo("productos");
+        }
+        else
+        {
+            mensajeError = "Usuario o contraseña incorrectos.";
+        }
+    }
+
+    private void CerrarSesion()
+    {
+        SecurityService.Logout();
+    }
+}

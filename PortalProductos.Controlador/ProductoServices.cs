@@ -38,5 +38,28 @@ namespace PortalProductos.Controlador
 
             return await Task.FromResult(query.ToList());
         }
+
+        public async Task EliminarProductoAsync(int id)
+        {
+            var producto = _listaProductos.FirstOrDefault(q => q.Id == id);
+            if (producto != null)
+            {
+                _listaProductos.Remove(producto);
+            }
+            await Task.CompletedTask;
+        }
+
+        public async Task EditarProductoAsync(Productos productoActualizado)
+        {
+            var exists = _listaProductos.FirstOrDefault(q => q.Id == productoActualizado.Id);
+            if (exists != null)
+            {
+                exists.Nombre = productoActualizado.Nombre;
+                exists.Precio = productoActualizado.Precio;
+                exists.idCliente = productoActualizado.idCliente;
+            }
+
+            await Task.CompletedTask;
+        }
     }
 }
