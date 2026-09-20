@@ -1,0 +1,11 @@
+<Solution>
+  <!-- Ruta Vista -->
+  <Project Path="PortalProductos.Vista/PortalProductos.Vista.csproj" />
+
+  <!-- Ruta Modelo -->
+  <Project Path="PortalProductos.Modelo/PortalProductos.Modelo.csproj" />
+
+  <!-- Ruta Controlador -->
+  <Project Path="PortalProductos.Controlador/PortalProductos.Controlador.csproj" />
+
+</Solution>
