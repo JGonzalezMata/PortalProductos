@@ -74,7 +74,7 @@ namespace PortalProductos.Controlador
         {
             try
             {
-                var response = await _client.DeleteAsync($"Productos/{id}");
+                var response = await _client.DeleteAsync($"api/Productos/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(await response.Content.ReadAsStringAsync());

@@ -214,7 +214,7 @@ else
     {
         try
         {
-            if (!string.IsNullOrWhiteSpace(productoForm.Nombre))
+            if (!string.IsNullOrWhiteSpace(productoForm.Nombre) && !string.IsNullOrWhiteSpace(productoForm.idCliente) && productoForm.Precio > 0)
             {
 
                 if (editarProducto)
@@ -233,6 +233,14 @@ else
 
                 await CargarProductos();
             }
+            else
+            {
+                throw new ArgumentException("Uno o más elementos de la lista estan vacios.");
+            }
+        }
+        catch(ArgumentException ae)
+        {
+            MostrarError(ae.Message);
         }
         catch(Exception ex)
         {

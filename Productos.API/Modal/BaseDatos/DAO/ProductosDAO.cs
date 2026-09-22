@@ -62,6 +62,10 @@ namespace Productos.API.Modal.BaseDatos.DAO
             }
             catch (SqlException se)
             {
+                if (se.Number == 2627 || se.Number == 2601)
+                {
+                    throw new InvalidOperationException($"El codigo id de cliente ya existe en el sistema.");
+                }
                 if (se.Number == 50000)
                 {
                     throw new InvalidOperationException($"Se genero un error en Base de Datos: {se.Message}");
