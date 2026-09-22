@@ -9,5 +9,10 @@
             public const string EliminaProducto = "Usp_EliminaProducto";
             public const string Login = "Usp_Login";
         }
+
+        public struct Query
+        {
+            public const string QueryView = "select * from dbo.ProductosView";
+        }
     }
 }

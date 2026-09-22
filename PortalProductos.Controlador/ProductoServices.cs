@@ -1,5 +1,6 @@
 ﻿using PortalProductos.Modelo;
 using PortalProductos.Modelo.Entidades;
+using System.Net.Http.Json;
 
 namespace PortalProductos.Controlador
 {
@@ -29,8 +30,13 @@ namespace PortalProductos.Controlador
 
         public async Task<List<Productos>> ConsultaDinamica(string? nombre, string? idCliente)
         {
-            var respnse = await _client.GetAsync("https://localhost:4849/weatherforecast");
-            var content = await respnse.Content.ReadAsStringAsync();
+            
+            var response = await _client.GetAsync("https://localhost:4849/api/Productos");
+            if (response.IsSuccessStatusCode)
+            {
+                List<Productos> listaProductos = await response.Content.ReadFromJsonAsync<List<Productos>>();
+                _listaProductos = listaProductos;
+            }
             var query = _listaProductos.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
