@@ -5,6 +5,11 @@ namespace PortalProductos.Controlador
 {
     public class ProductoServices : IProductoServices
     {
+        private readonly HttpClient _client;
+        public ProductoServices(HttpClient client)
+        {
+            _client = client;
+        }
         private static List<Productos> _listaProductos = new List<Productos>
         {
             new Productos { Id = 1, Nombre = "Laptop", Precio = 1200, idCliente = "01Laptop" },
@@ -24,6 +29,8 @@ namespace PortalProductos.Controlador
 
         public async Task<List<Productos>> ConsultaDinamica(string? nombre, string? idCliente)
         {
+            var respnse = await _client.GetAsync("https://localhost:4849/weatherforecast");
+            var content = await respnse.Content.ReadAsStringAsync();
             var query = _listaProductos.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))

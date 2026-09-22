@@ -1,11 +1,6 @@
 <Solution>
-  <!-- Ruta Vista -->
-  <Project Path="PortalProductos.Vista/PortalProductos.Vista.csproj" />
-
-  <!-- Ruta Modelo -->
-  <Project Path="PortalProductos.Modelo/PortalProductos.Modelo.csproj" />
-
-  <!-- Ruta Controlador -->
   <Project Path="PortalProductos.Controlador/PortalProductos.Controlador.csproj" />
-
+  <Project Path="PortalProductos.Modelo/PortalProductos.Modelo.csproj" />
+  <Project Path="PortalProductos.Vista/PortalProductos.Vista.csproj" />
+  <Project Path="Productos.API/Productos.API.csproj" Id="d5ac8bd2-aa21-41b4-821e-f2fe6f0702a5" />
 </Solution>

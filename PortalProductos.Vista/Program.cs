@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
 //Registro de dependencias
 builder.Services.AddScoped<IProductoServices, ProductoServices>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
