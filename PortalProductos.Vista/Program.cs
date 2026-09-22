@@ -1,5 +1,6 @@
 using PortalProductos.Controlador;
 using PortalProductos.Vista.Components;
+using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,18 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<IProductoServices, ProductoServices>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped(sp => {
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (sender, cert, chain, SslPolicyErrors) => true
+    };
+
+    return new HttpClient(handler)
+    {
+        BaseAddress = new Uri("https://localhost:4849/")
+    };
+});
 
 var app = builder.Build();
 

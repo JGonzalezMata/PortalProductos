@@ -18,6 +18,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCors("AllowPortal");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

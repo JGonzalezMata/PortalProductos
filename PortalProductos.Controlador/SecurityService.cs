@@ -25,7 +25,7 @@ namespace PortalProductos.Controlador
 
             try
             {
-                var response = await _client.PostAsync("https://localhost:4849/api/Security", jsonContent);
+                var response = await _client.PostAsync("api/Security", jsonContent);
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(await response.Content.ReadAsStringAsync());

@@ -16,7 +16,7 @@ namespace PortalProductos.Controlador
 
         public async Task<List<Productos>> ObtieneProductosAsync()
         {
-            var response = await _client.GetAsync("https://localhost:4849/api/Productos");
+            var response = await _client.GetAsync("api/Productos");
             if (response.IsSuccessStatusCode)
             {
                 List<Productos>? listaProductos = await response.Content.ReadFromJsonAsync<List<Productos>>();
@@ -53,7 +53,7 @@ namespace PortalProductos.Controlador
 
             try
             {
-                var response = await _client.PostAsync("https://localhost:4849/api/Productos", jsonContent);
+                var response = await _client.PostAsync("api/Productos", jsonContent);
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(await response.Content.ReadAsStringAsync());
@@ -74,7 +74,7 @@ namespace PortalProductos.Controlador
         {
             try
             {
-                var response = await _client.DeleteAsync($"https://localhost:4849/api/Productos/{id}");
+                var response = await _client.DeleteAsync($"Productos/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(await response.Content.ReadAsStringAsync());
@@ -98,7 +98,7 @@ namespace PortalProductos.Controlador
 
             try
             {
-                var response = await _client.PutAsync("https://localhost:4849/api/Productos", jsonContent);
+                var response = await _client.PutAsync("api/Productos", jsonContent);
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(await response.Content.ReadAsStringAsync());
