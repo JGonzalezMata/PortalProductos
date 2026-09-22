@@ -6,7 +6,7 @@
         string? UsuarioActual {  get; }
         event Func<Task>? OnAuthStateChanged;
 
-        Task<bool> LoginAsync(string username, string password);
+        Task<bool> LoginAsync(Modelo.Entidades.LoginRequest loginRequest);
         void Logout();
     }
 }

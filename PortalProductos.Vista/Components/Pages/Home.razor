@@ -35,12 +35,12 @@
 
                 <div class="mb-3">
                     <label class="form-label">Usuario</label>
-                    <input type="text" class="form-control" @bind="usuario"/>
+                    <input type="text" class="form-control" @bind="loginRequest.username"/>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" @bind="password"/>
+                    <input type="password" class="form-control" @bind="loginRequest.password"/>
                 </div>
 
                 <button class="btn btn-primary w-100" @onclick="IniciarSesion">
@@ -52,21 +52,23 @@
 </div>
 
 @code{
-    private string usuario = "";
-    private string password = "";
+    private Modelo.Entidades.LoginRequest loginRequest = new Modelo.Entidades.LoginRequest();
     private string? mensajeError;
 
     private async Task IniciarSesion()
     {
-        var isLoggedIn = await SecurityService.LoginAsync(usuario, password);
-        if (isLoggedIn)
+        try
         {
-            mensajeError = null;
-            Navigation.NavigateTo("productos");
+            var isLoggedIn = await SecurityService.LoginAsync(loginRequest);
+            if (isLoggedIn)
+            {
+                mensajeError = null;
+                Navigation.NavigateTo("productos");
+            }
         }
-        else
+        catch (HttpRequestException hre)
         {
-            mensajeError = "Usuario o contraseña incorrectos.";
+            mensajeError = hre.Message;
         }
     }
 

@@ -1,42 +1,36 @@
 ﻿using PortalProductos.Modelo;
 using PortalProductos.Modelo.Entidades;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace PortalProductos.Controlador
 {
     public class ProductoServices : IProductoServices
     {
+        private static List<Productos> _listaProductos = new List<Productos>();
         private readonly HttpClient _client;
         public ProductoServices(HttpClient client)
         {
             _client = client;
         }
-        private static List<Productos> _listaProductos = new List<Productos>
-        {
-            new Productos { Id = 1, Nombre = "Laptop", Precio = 1200, idCliente = "01Laptop" },
-                new Productos { Id = 2, Nombre = "Desktop", Precio = 2400, idCliente = "01Desktop" }
-        };
+
         public async Task<List<Productos>> ObtieneProductosAsync()
         {
+            var response = await _client.GetAsync("https://localhost:4849/api/Productos");
+            if (response.IsSuccessStatusCode)
+            {
+                List<Productos>? listaProductos = await response.Content.ReadFromJsonAsync<List<Productos>>();
+                if (listaProductos != null)
+                {
+                    _listaProductos = listaProductos;
+                }
+            }
             return await Task.FromResult(_listaProductos);
-        }
-
-        public async Task AgregarProducto(Productos nuevoProducto)
-        {
-            nuevoProducto.Id = _listaProductos.Max(val =>  val.Id) + 1;
-            _listaProductos.Add(nuevoProducto);
-            await Task.CompletedTask;
         }
 
         public async Task<List<Productos>> ConsultaDinamica(string? nombre, string? idCliente)
         {
             
-            var response = await _client.GetAsync("https://localhost:4849/api/Productos");
-            if (response.IsSuccessStatusCode)
-            {
-                List<Productos> listaProductos = await response.Content.ReadFromJsonAsync<List<Productos>>();
-                _listaProductos = listaProductos;
-            }
             var query = _listaProductos.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
@@ -52,26 +46,72 @@ namespace PortalProductos.Controlador
             return await Task.FromResult(query.ToList());
         }
 
+        public async Task AgregarProducto(Productos nuevoProducto)
+        {
+            var payload = JsonSerializer.Serialize(nuevoProducto);
+            var jsonContent = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await _client.PostAsync("https://localhost:4849/api/Productos", jsonContent);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+                }
+            }
+            catch (HttpRequestException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            await Task.CompletedTask;
+        }
+
         public async Task EliminarProductoAsync(int id)
         {
-            var producto = _listaProductos.FirstOrDefault(q => q.Id == id);
-            if (producto != null)
+            try
             {
-                _listaProductos.Remove(producto);
+                var response = await _client.DeleteAsync($"https://localhost:4849/api/Productos/{id}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+                }
+            }
+            catch (HttpRequestException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
             await Task.CompletedTask;
         }
 
         public async Task EditarProductoAsync(Productos productoActualizado)
         {
-            var exists = _listaProductos.FirstOrDefault(q => q.Id == productoActualizado.Id);
-            if (exists != null)
-            {
-                exists.Nombre = productoActualizado.Nombre;
-                exists.Precio = productoActualizado.Precio;
-                exists.idCliente = productoActualizado.idCliente;
-            }
+            var payload = JsonSerializer.Serialize(productoActualizado);
+            var jsonContent = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
 
+            try
+            {
+                var response = await _client.PutAsync("https://localhost:4849/api/Productos", jsonContent);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+                }
+            }
+            catch (HttpRequestException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             await Task.CompletedTask;
         }
     }

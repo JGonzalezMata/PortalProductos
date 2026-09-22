@@ -146,6 +146,31 @@ else
 
 <!-- #endregion -->
 
+<!-- #region Modal error-->
+@if (mostrarError)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-danger shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Error detectado
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="OcultarError"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0 text-dark">@mensajeErrorModal</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="OcultarError">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- #endregion-->
+
 @code {
     #region Variables
     private List<EntidadesProductos.Productos>? productos;
@@ -154,6 +179,8 @@ else
     private string? filtroIdCliente;
     private bool mostrarFormularioAlta = false;
     private bool editarProducto = false;
+    private bool mostrarError = false;
+    private string mensajeErrorModal = string.Empty;
     //protected override async Task OnInitializedAsync() => await CargarProductos();
     //protected override async Task OnInitializedAsync() => await FiltrarProductos();
     #endregion
@@ -165,7 +192,7 @@ else
             Navigation.NavigateTo("");
             return;
         }
-        await FiltrarProductos();
+        await CargarProductos();
     }
 
     private void AlternarVista()
@@ -185,25 +212,33 @@ else
 
     private async Task GuardarNuevoProducto()
     {
-        if (!string.IsNullOrWhiteSpace(productoForm.Nombre))
+        try
         {
-
-            if (editarProducto)
+            if (!string.IsNullOrWhiteSpace(productoForm.Nombre))
             {
-                await ProductoService.EditarProductoAsync(productoForm);
+
+                if (editarProducto)
+                {
+                    await ProductoService.EditarProductoAsync(productoForm);
+                }
+                else
+                {
+                    await ProductoService.AgregarProducto(productoForm);
+                }
+
+
+                productoForm = new EntidadesProductos.Productos();
+
+                mostrarFormularioAlta = false;
+
+                await CargarProductos();
             }
-            else
-            {
-                await ProductoService.AgregarProducto(productoForm);
-            }
-
-
-            productoForm = new EntidadesProductos.Productos();
-
-            mostrarFormularioAlta = false;
-
-            await CargarProductos();
         }
+        catch(Exception ex)
+        {
+            MostrarError(ex.Message);
+        }
+
     }
 
     private async Task FiltrarProductos()
@@ -213,9 +248,16 @@ else
 
     private async Task EliminarProducto(int id)
     {
-        await ProductoService.EliminarProductoAsync(id);
+        try
+        {
+            await ProductoService.EliminarProductoAsync(id);
 
-        await FiltrarProductos();
+            await CargarProductos();
+        }
+        catch(Exception ex)
+        {
+            MostrarError(ex.Message);
+        }
     }
 
     private void CargarEditar(EntidadesProductos.Productos productoSelect)
@@ -236,7 +278,19 @@ else
     {
         filtroNombre = string.Empty;
         filtroIdCliente = string.Empty;
-        await FiltrarProductos();
+        await CargarProductos();
     }
 
+    private void MostrarError(string mensaje)
+    {
+        mostrarError = true;
+        mensajeErrorModal = mensaje;
+        StateHasChanged();
+    }
+
+    private void OcultarError()
+    {
+        mostrarError = false;
+        mensajeErrorModal = string.Empty;
+    }
 }

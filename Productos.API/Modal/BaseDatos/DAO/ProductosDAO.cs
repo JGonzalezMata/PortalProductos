@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Productos.API.Modal.BaseDatos.Core;
-using Productos.API.Modal.Entidades;
 using System.Data;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Productos.API.Modal.BaseDatos.DAO
 {
@@ -89,12 +87,10 @@ namespace Productos.API.Modal.BaseDatos.DAO
 
                 using var cmd = new SqlCommand(SP.SQL.ActualizaProducto, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", producto.Id);
                 cmd.Parameters.AddWithValue("@NombreProducto", producto.Nombre);
                 cmd.Parameters.AddWithValue("@Precio", producto.Precio);
                 cmd.Parameters.AddWithValue("@IdCliente", producto.idCliente);
-
-                await conn.OpenAsync();
-                filasAfectadas = await cmd.ExecuteNonQueryAsync();
 
                 await conn.OpenAsync();
                 filasAfectadas = await cmd.ExecuteNonQueryAsync();
@@ -120,6 +116,7 @@ namespace Productos.API.Modal.BaseDatos.DAO
 
         public async Task<bool> EliminaProductoAsync(int id)
         {
+            var filasAfectadas = 0;
             try
             {
                 using var conn = new SqlConnection(_connectionString);
@@ -130,8 +127,7 @@ namespace Productos.API.Modal.BaseDatos.DAO
 
 
                 await conn.OpenAsync();
-                var filasAfectadas = await cmd.ExecuteNonQueryAsync();
-                return filasAfectadas > 0;
+                filasAfectadas = await cmd.ExecuteNonQueryAsync();
             }
             catch (SqlException se)
             {
@@ -148,6 +144,7 @@ namespace Productos.API.Modal.BaseDatos.DAO
             {
                 throw new Exception("Error no controlado", ex);
             }
+            return filasAfectadas > 0;
         }
     }
 }

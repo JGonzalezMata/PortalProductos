@@ -38,7 +38,7 @@ namespace Productos.API.Controllers
             return Ok(new { mensaje = "Producto actualizado exitosamente." });
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarProducto(int id)
         {
             var resultado = await _productosDAO.EliminaProductoAsync(id);
