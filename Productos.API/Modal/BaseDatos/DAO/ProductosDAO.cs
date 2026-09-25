@@ -22,7 +22,8 @@ namespace Productos.API.Modal.BaseDatos.DAO
                 var lista = new List<Entidades.Productos>();
 
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(SP.Query.QueryProductos, conn);
+                using var cmd = new SqlCommand(SP.SQL.ObtieneProductos, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 await conn.OpenAsync();
                 using var reader = await cmd.ExecuteReaderAsync();
@@ -58,7 +59,8 @@ namespace Productos.API.Modal.BaseDatos.DAO
                 var lista = new List<Entidades.Proveedores>();
 
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(SP.Query.QueryProveedores, conn);
+                using var cmd = new SqlCommand(SP.SQL.ObtieneProveedores, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 await conn.OpenAsync();
                 using var reader = await cmd.ExecuteReaderAsync();
@@ -88,7 +90,8 @@ namespace Productos.API.Modal.BaseDatos.DAO
                 var lista = new List<Entidades.TiposProductos>();
 
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(SP.Query.QueryTipos, conn);
+                using var cmd = new SqlCommand(SP.SQL.ObtieneTipos, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 await conn.OpenAsync();
                 using var reader = await cmd.ExecuteReaderAsync();

@@ -8,13 +8,10 @@
             public const string ActualizaProducto = "Usp_ActualizaProducto";
             public const string EliminaProducto = "Usp_EliminaProducto";
             public const string Login = "Usp_Login";
-        }
 
-        public struct Query
-        {
-            public const string QueryProductos = "select * from dbo.ProductosView";
-            public const string QueryProveedores = "select * from dbo.ProveedoresView";
-            public const string QueryTipos = "select * from dbo.TiposView";
+            public const string ObtieneProductos = "Usp_ObtieneProductos";
+            public const string ObtieneProveedores = "Usp_ObtieneProveedores";
+            public const string ObtieneTipos = "Usp_ObtieneTipos";
         }
     }
 }
