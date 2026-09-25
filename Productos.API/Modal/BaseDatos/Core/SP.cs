@@ -12,7 +12,9 @@
 
         public struct Query
         {
-            public const string QueryView = "select * from dbo.ProductosView";
+            public const string QueryProductos = "select * from dbo.ProductosView";
+            public const string QueryProveedores = "select * from dbo.ProveedoresView";
+            public const string QueryTipos = "select * from dbo.TiposView";
         }
     }
 }

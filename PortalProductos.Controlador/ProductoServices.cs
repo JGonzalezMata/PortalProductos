@@ -7,16 +7,22 @@ namespace PortalProductos.Controlador
 {
     public class ProductoServices : IProductoServices
     {
-        private static List<Productos> _listaProductos = new List<Productos>();
+        #region Variables
+        private static List<Productos> _listaProductos = new();
+        private static List<Proveedores> _listaProveedores = new();
+        private static List<TiposProductos> _listaTipos = new();
         private readonly HttpClient _client;
+        #endregion
+
         public ProductoServices(HttpClient client)
         {
             _client = client;
         }
 
+        #region Consultas
         public async Task<List<Productos>> ObtieneProductosAsync()
         {
-            var response = await _client.GetAsync("api/Productos");
+            var response = await _client.GetAsync("api/Productos/GetProducts");
             if (response.IsSuccessStatusCode)
             {
                 List<Productos>? listaProductos = await response.Content.ReadFromJsonAsync<List<Productos>>();
@@ -28,23 +34,65 @@ namespace PortalProductos.Controlador
             return await Task.FromResult(_listaProductos);
         }
 
-        public async Task<List<Productos>> ConsultaDinamica(string? nombre, string? idCliente)
+        public async Task<List<Proveedores>> ObtieneProveedoresAsync()
+        {
+            var response = await _client.GetAsync("api/Productos/GetSuppliers");
+            if (response.IsSuccessStatusCode)
+            {
+                List<Proveedores>? listaProveedores = await response.Content.ReadFromJsonAsync<List<Proveedores>>();
+                if (listaProveedores != null)
+                {
+                    _listaProveedores = listaProveedores;
+                }
+            }
+            return await Task.FromResult(_listaProveedores);
+        }
+
+        public async Task<List<TiposProductos>> ObtieneTiposAsync()
+        {
+            var response = await _client.GetAsync("api/Productos/GetTypes");
+            if (response.IsSuccessStatusCode)
+            {
+                List<TiposProductos>? listaTipos = await response.Content.ReadFromJsonAsync<List<TiposProductos>>();
+                if (listaTipos != null)
+                {
+                    _listaTipos = listaTipos;
+                }
+            }
+            return await Task.FromResult(_listaTipos);
+        }
+
+        public async Task<List<Productos>> ConsultaDinamica(string? nombre, string? idProductoProveedor, int? idProveedor, int? idTipoProducto)
         {
             
             var query = _listaProductos.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                query = query.Where(q => q.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(q => q.NombreProducto.Contains(nombre, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.IsNullOrWhiteSpace(idCliente))
+            if (!string.IsNullOrWhiteSpace(idProductoProveedor))
             {
-                query = query.Where(q => q.Nombre.Contains(idCliente, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(q => q.IdProductoProveedor.Contains(idProductoProveedor, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (idProveedor > 0)
+            {
+                query = query.Where(q => q.IdProveedor == idProveedor);
+            }
+
+            if (idTipoProducto > 0)
+            {
+                query = query.Where(q => q.IdTipoProducto == idTipoProducto);
             }
 
             return await Task.FromResult(query.ToList());
         }
+
+        #endregion
+
+        #region CUD
 
         public async Task AgregarProducto(Productos nuevoProducto)
         {
@@ -114,5 +162,7 @@ namespace PortalProductos.Controlador
             }
             await Task.CompletedTask;
         }
+
+        #endregion
     }
 }

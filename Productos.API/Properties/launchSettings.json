@@ -17,7 +17,7 @@
       "applicationUrl": "https://localhost:7249;https://localhost:4849",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__DefaultConnection": "Data Source=DESKTOP-OR98KCB;Initial Catalog=dbo.Productos;User ID=User;Password=Abcd1@3$;Persist Security Info=True;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Application Name=ProductosAPI;"
+        "ConnectionStrings__DefaultConnection": "Data Source=DESKTOP-OR98KCB;Initial Catalog=Productos;User ID=User;Password=Abcd1@3$;Persist Security Info=True;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Application Name=ProductosAPI;"
       }
     }
   }

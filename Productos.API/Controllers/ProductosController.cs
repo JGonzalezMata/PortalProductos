@@ -15,11 +15,25 @@ namespace Productos.API.Controllers
             _productosDAO = productosDAO;
         }
 
-        [HttpGet]
+        [HttpGet("GetProducts", Name = "GetProducts")]
         public async Task<IActionResult> ObtieneProductos()
         {
             var productos = await _productosDAO.ObtenerProductosAsync();
             return Ok(productos);
+        }
+
+        [HttpGet("GetSuppliers", Name = "GetSuppliers")]
+        public async Task<IActionResult> ObtieneProveedores()
+        {
+            var proveedores = await _productosDAO.ObtenerProveedoresAsync();
+            return Ok(proveedores);
+        }
+
+        [HttpGet("GetTypes", Name = "GetTypes")]
+        public async Task<IActionResult> ObtieneTipos()
+        {
+            var tiposProductos = await _productosDAO.ObtenerTiposAsync();
+            return Ok(tiposProductos);
         }
 
         [HttpPost]
